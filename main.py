@@ -2,7 +2,7 @@ import bpy
 import json
 from typing import TypedDict
 
-IMPORT_PATH = "/home/miguel/python/glbuffer_importer/data.json"
+IMPORT_PATH = "/mnt/novaera/python/blender-glbuffer-importer/data.json"
 
 
 class Indices(TypedDict):
@@ -45,32 +45,33 @@ def load_data():
 def get_triangles_mode_strip(
     primitives: list[Primitive],
 ) -> list[tuple[int, int, int]]:  # -> list[Any]:
-    for primitive in primitives:
+    result: list[tuple[int, int, int]] = []
 
+    for primitive in primitives:
         print(primitive.keys())
 
         print("mode", primitive["mode"])
         print("offset", primitive["offset"])
 
-        if primitive["mode"] != 5:
-            continue
-
         indices = list(primitive["indices"]["_elements"].values())
 
-        print("indices len:", len(indices))
+        if primitive["mode"] == 5:
+            for i in range(len(indices) - 2):
+                # For even-numbered triangles, keep vertex order
+                # For odd-numbered triangles, swap second and third vertices
+                if i % 2 == 0:
+                    triangle = (indices[i], indices[i + 1], indices[i + 2])
+                else:
+                    triangle = (indices[i], indices[i + 2], indices[i + 1])
+                result.append(triangle)
 
-        triangles: list[tuple[int, int, int]] = []
-        for i in range(len(indices) - 2):
-            # For even-numbered triangles, keep vertex order
-            # For odd-numbered triangles, swap second and third vertices
-            if i % 2 == 0:
-                triangle = (indices[i], indices[i + 1], indices[i + 2])
-            else:
-                triangle = (indices[i], indices[i + 2], indices[i + 1])
-            triangles.append(triangle)
+        elif primitive["mode"] == 4:
+            for i in range(0, len(indices), 3):
+                result.append((indices[i], indices[i + 1], indices[i + 2]))
+        else:
+            raise Exception("mode not handled")
 
-        return triangles
-    return []
+    return result
 
 
 def create_object(shape_data: list[GeoExporter]):
