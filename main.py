@@ -67,7 +67,9 @@ def get_triangles_mode_strip(
                 triangle = (indices[i], indices[i + 1], indices[i + 2])
             else:
                 triangle = (indices[i], indices[i + 2], indices[i + 1])
-            triangles.append(triangle)
+                
+            if triangle[0] != triangle[1] and triangle[1] != triangle[2] and triangle[0] != triangle[2]:
+                triangles.append(triangle)
 
         return triangles
     return []
