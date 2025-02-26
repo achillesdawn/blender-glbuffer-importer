@@ -57,15 +57,17 @@ def get_triangles_mode_strip(
 
         if primitive["mode"] == 5:
             for i in range(len(indices) - 2):
+
                 # For even-numbered triangles, keep vertex order
                 # For odd-numbered triangles, swap second and third vertices
+
                 if i % 2 == 0:
                     triangle = (indices[i], indices[i + 1], indices[i + 2])
                 else:
                     triangle = (indices[i], indices[i + 2], indices[i + 1])
                 
-            if triangle[0] != triangle[1] and triangle[1] != triangle[2] and triangle[0] != triangle[2]:
-                    result.append(triangle)
+                if triangle[0] != triangle[1] and triangle[1] != triangle[2] and triangle[0] != triangle[2]:
+                        result.append(triangle)
 
         elif primitive["mode"] == 4:
             for i in range(0, len(indices), 3):
